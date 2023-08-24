@@ -15,6 +15,7 @@
 /// ### task_num
 /// このタスクの検索用名です。重複は許されません一意の識別子です。
 /// ### task_event
+/// 
 
 use rusqlite::{Connection, Result};
 
