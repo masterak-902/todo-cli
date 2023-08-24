@@ -22,9 +22,8 @@
 mod models; // models.rsをインポート
 mod db; // db.rsをインポート
 
-use rusqlite::{Connection, Result, params};
+use rusqlite::{Connection, Result};
 use crate::models::ToDo; // ToDo structをインポート
-use crate::db::console_view; // console_view関数をインポート
 
 fn main() -> Result<()> {
     let conn = Connection::open_in_memory()?;
@@ -34,16 +33,17 @@ fn main() -> Result<()> {
             task_check  INTEGER,
             task_event  TEXT NOT NULL
         )",
-        [],
+        (),
     )?;
     
     let me = ToDo::new(0, false, "example".to_string());
-    let task_check_int = if me.task_check() { 1 } else { 0 };
-    conn.execute(
-        "INSERT INTO ToDo (task_check, task_event) VALUES (?1, ?2)",
-        params![task_check_int, me.task_event()],
-    )?;
-    match console_view(&conn) {
+
+    match db::task_add(&conn, &me) {
+        Ok(_) => println!("Task added successfully"),
+        Err(e) => println!("Failed to add task: {:?}", e),
+    }
+    
+    match db::console_view(&conn) {
         Ok(_) => println!("Success!"),
         Err(e) => println!("An error occurred: {:?}", e),
     }
