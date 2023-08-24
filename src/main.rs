@@ -22,7 +22,7 @@ use rusqlite::{Connection, Result};
 #[allow(dead_code)]
 #[derive(Debug)]
 struct ToDo {
-    task_num: u32,
+    task_num: i32,
     task_check: bool,
     task_event: String,
 }
@@ -46,12 +46,14 @@ fn main() -> Result<()>{
         task_check: false,
         task_event: "example".to_string(),
     };
+
+    let task_check_int = if me.task_check { 1 } else { 0 };
     conn.execute(
         "INSERT INTO ToDo (task_check, task_event) VALUES (?1, ?2)",
-        (&me.task_check, &me.task_event),
+        (&task_check_int, &me.task_event),
     )?;
 
-    match console_view() {
+    match console_view(&conn) {
         Ok(_) => println!("Success!"),
         Err(e) => println!("An error occurred: {:?}", e),
     }
@@ -60,14 +62,14 @@ fn main() -> Result<()>{
 }
 
 //コンソールに出力
-fn console_view()-> Result<()>{
-    let conn = Connection::open_in_memory()?;
-    
+fn console_view(conn: &Connection)-> Result<()>{
+
     let mut stmt = conn.prepare("SELECT task_num, task_check, task_event FROM ToDo")?;
     let task_iter = stmt.query_map([], |row| {
+        let task_check_int: i32 = row.get(1)?;
         Ok(ToDo {
             task_num: row.get(0)?,
-            task_check: row.get(1)?,
+            task_check: task_check_int != 0,
             task_event: row.get(2)?,
         })
     })?;
