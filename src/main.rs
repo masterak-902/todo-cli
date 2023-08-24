@@ -17,68 +17,35 @@
 /// ### task_event
 /// 
 
-use rusqlite::{Connection, Result};
+// main.rs
 
-#[allow(dead_code)]
-#[derive(Debug)]
-struct ToDo {
-    task_num: i32,
-    task_check: bool,
-    task_event: String,
-}
-fn main() -> Result<()>{
-    //open_in_memory：メモリ上のデータベース:
+mod models; // models.rsをインポート
+mod db; // db.rsをインポート
+
+use rusqlite::{Connection, Result, params};
+use crate::models::ToDo; // ToDo structをインポート
+use crate::db::console_view; // console_view関数をインポート
+
+fn main() -> Result<()> {
     let conn = Connection::open_in_memory()?;
-
-    // SQLの初期設定
     conn.execute(
         "CREATE TABLE ToDo (
             task_num    INTEGER PRIMARY KEY,
             task_check  INTEGER,
             task_event  TEXT NOT NULL
         )",
-        (), // empty list of parameters.
+        [],
     )?;
-
-    // データの追加
-    let me = ToDo {
-        task_num: 0,
-        task_check: false,
-        task_event: "example".to_string(),
-    };
-
-    let task_check_int = if me.task_check { 1 } else { 0 };
+    
+    let me = ToDo::new(0, false, "example".to_string());
+    let task_check_int = if me.task_check() { 1 } else { 0 };
     conn.execute(
         "INSERT INTO ToDo (task_check, task_event) VALUES (?1, ?2)",
-        (&task_check_int, &me.task_event),
+        params![task_check_int, me.task_event()],
     )?;
-
     match console_view(&conn) {
         Ok(_) => println!("Success!"),
         Err(e) => println!("An error occurred: {:?}", e),
-    }
-
-    Ok(())
-}
-
-//コンソールに出力
-fn console_view(conn: &Connection)-> Result<()>{
-
-    let mut stmt = conn.prepare("SELECT task_num, task_check, task_event FROM ToDo")?;
-    let task_iter = stmt.query_map([], |row| {
-        let task_check_int: i32 = row.get(1)?;
-        Ok(ToDo {
-            task_num: row.get(0)?,
-            task_check: task_check_int != 0,
-            task_event: row.get(2)?,
-        })
-    })?;
-
-    for task_result in task_iter {
-        match task_result {
-            Ok(task) => println!("Found task: {:?}", task),
-            Err(err) => println!("Error occurred: {:?}", err),
-        }
     }
     Ok(())
 }
