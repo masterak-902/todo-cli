@@ -50,7 +50,7 @@ fn main() -> Result<()> {
         }
     }*/
 
-    let me = ToDo::new(0, false, "example".to_string());
+    let me = ToDo::new(Some(0), false, "example".to_string());
     // データ追加を処理する関数
     match db::task_add(&conn, &me) {
         Ok(_) => println!("Task added successfully"),

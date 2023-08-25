@@ -16,12 +16,19 @@ pub fn console_view(conn: &Connection) -> Result<()> {
 
     for task_result in task_iter {
         match task_result {
-            Ok(task) => println!(
-                "Found task: task_num = {}, task_check = {}, task_event = {}",
-                task.task_num(),
-                task.task_check(),
-                task.task_event()
-            ),
+            Ok(task) => {
+                let task_num = match task.task_num() {
+                    Some(num) => num.to_string(),
+                    None => "None".to_string(),
+                };
+
+                println!(
+                    "Found task: task_num = {}, task_check = {}, task_event = {}",
+                    task_num,
+                    task.task_check(),
+                    task.task_event()
+                )
+            },
             Err(err) => println!("Error occurred: {:?}", err),
         }
     }
