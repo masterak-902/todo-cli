@@ -21,10 +21,9 @@
 
 mod models; // models.rsをインポート
 mod db; // db.rsをインポート
-// mod cli;
+mod cli;
 
 use rusqlite::{Connection, Result};
-use crate::models::ToDo; // ToDo structをインポート
 
 fn main() -> Result<()> {
     let conn = Connection::open_in_memory()?;
@@ -37,25 +36,25 @@ fn main() -> Result<()> {
         (),
     )?;
 
-    /*
+    
     // CLI データの追加を入力する関数
     match cli::cli_add() {
         Ok(todo) => {
             // ToDo情報が正常に取得できたら、DBに保存などの処理を行う
-            println!("Successfully add a ToDo: {:?}", todo);
+            // データ追加を処理する関数
+            match db::task_add(&conn, &todo) {
+                Ok(_) => println!("Task added successfully"),
+                Err(e) => println!("Failed to add task: {:?}", e),
+            }
         }
         Err(e) => {
             // エラーが発生した場合の処理
             eprintln!("An error occurred: {:?}", e);
         }
-    }*/
-
-    let me = ToDo::new(Some(0), false, "example".to_string());
-    // データ追加を処理する関数
-    match db::task_add(&conn, &me) {
-        Ok(_) => println!("Task added successfully"),
-        Err(e) => println!("Failed to add task: {:?}", e),
     }
+
+    //let me = ToDo::new(Some(0), false, "example".to_string());
+    
     
     // データの表示を処理する関数
     match db::console_view(&conn) {
