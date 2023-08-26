@@ -14,7 +14,11 @@ pub fn console_view(conn: &Connection) -> Result<()> {
         ))
     })?;
 
+    let mut has_data = false;  // フラグ変数
+
     for task_result in task_iter {
+        has_data = true;
+        
         match task_result {
             Ok(task) => {
                 let task_num = match task.task_num() {
@@ -32,6 +36,11 @@ pub fn console_view(conn: &Connection) -> Result<()> {
             Err(err) => println!("Error occurred: {:?}", err),
         }
     }
+
+    if !has_data {  // データがなかった場合
+        println!("No data");
+    }
+
     Ok(())
 }
 
