@@ -26,12 +26,18 @@ pub fn console_view(conn: &Connection) -> Result<()> {
                     None => "None".to_string(),
                 };
 
+                let check_mark = if task.task_check() {
+                    "☒"  // タスクが完了している場合
+                } else {
+                    "☐"  // タスクが未完了の場合
+                };
+
                 println!(
-                    "Found task: task_num = {}, task_check = {}, task_event = {}",
-                    task_num,
-                    task.task_check(),
-                    task.task_event()
-                )
+                    "{:^3}{:^3}{}",
+                    check_mark,       // ☒ or ☐
+                    task_num,         // タスク番号
+                    task.task_event() // タスクのイベント
+                );
             },
             Err(err) => println!("Error occurred: {:?}", err),
         }
