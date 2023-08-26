@@ -108,3 +108,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+//Todo
+// taskの表示を整形する
+// taskを完了させる処理がない
+// CLIの表示非表示を処理する。crossterm と termion
