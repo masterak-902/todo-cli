@@ -16,3 +16,5 @@ pub fn cli_add() -> io::Result<Option<ToDo>>{
     // すべてが成功した場合は、Okで包んだToDoオブジェクトを返す
     Ok(Some(ToDo::new(None, false, task_event)))
 }
+
+//SQLから番号指定でタスクを取得する

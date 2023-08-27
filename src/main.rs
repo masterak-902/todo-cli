@@ -26,7 +26,33 @@ use std::io::{self, Write};
 
 use rusqlite::{Connection, Result};
 
-fn main() -> Result<()> {
+///`Box<dyn std::error::Error>` 
+/// Rustでよく使われるエラーハンドリングのパターンの一つです。
+/// これは "boxed dynamic trait object" であり、`std::error::Error` トレイトを実装する任意の型を表します。
+///- `Box`: ヒープに格納される値を指すスマートポインタ。
+///- `dyn`: "dynamic dispatch"を使用することを示すキーワード。これにより、コンパイル時ではなく実行時にメソッドが呼び出されます。
+///- `std::error::Error`: エラーハンドリング用の基本的なトレイト。`std::fmt::Debug` と `std::fmt::Display` トレイトを要求します。
+///
+///`Box<dyn std::error::Error>` は、異なるエラー型を同一の型として扱いたい場面でよく使用されます。これにより、異なるエラー型を返す可能性がある関数でも、一つの統一されたエラー型を返すようにすることができます。
+///
+///例えば、以下のような関数があるとします。
+///
+///```rust
+///// この関数は io::Error か ParseIntError を返す可能性がある
+///fn do_something() -> Result<(), Box<dyn std::error::Error>> {
+///    let f = File::open("some_file.txt")?;  // io::Error を返す可能性がある
+///    let parsed_num: i32 = "10".parse()?;  // ParseIntError を返す可能性がある
+///    // ...（何らかの処理）
+///    Ok(())
+///}
+///```
+///この関数は、`io::Error` を返す可能性もあれば、`ParseIntError` を返す可能性もあります。
+///それぞれのエラー型に対して `?` 演算子を使用すると、それぞれのエラー型を `Box<dyn std::error::Error>` に自動的に変換してくれます。
+/// これにより、関数は単一の `Result` 型を返すことができます。
+///このような動的なエラー処理は便利ですが、実行時のオーバーヘッドがある場合もあります。
+///そのため、パフォーマンスが重要な場面では他のエラーハンドリングの手法が選ばれることもあります。
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conn = Connection::open_in_memory()?;
     conn.execute(
         "CREATE TABLE ToDo (
@@ -43,13 +69,14 @@ fn main() -> Result<()> {
         println!("1. Add task");
         println!("2. Delete task");
         println!("3. Show tasks");
+        println!("5. Task Complete");
         println!("4. Quit");
 
         print!("Enter your choice: ");
-        io::stdout().flush().unwrap();
+        io::stdout().flush()?;
 
         let mut choice = String::new();
-        io::stdin().read_line(&mut choice).unwrap();
+        io::stdin().read_line(&mut choice)?;
 
         let choice: u32 = match choice.trim().parse() {
             Ok(num) => num,
@@ -97,6 +124,9 @@ fn main() -> Result<()> {
                 }
             },
             4 => {
+                
+            },
+            5 => {
                 println!("Quitting...");
                 break;
             },
