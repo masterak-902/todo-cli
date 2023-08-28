@@ -152,5 +152,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 //Todo
-// taskを完了させる処理がない
 // CLIの表示非表示を処理する。crossterm と termion
