@@ -28,7 +28,7 @@ mod cli;
 use std::io::{self, Write};
 
 //外部クレート
-use crossterm::{self, terminal::Clear, ExecutableCommand};
+use crossterm::{self, terminal::Clear, ExecutableCommand, cursor};
 use rusqlite::{Connection, Result};
 
 ///`Box<dyn std::error::Error>` 
@@ -68,9 +68,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (),
     )?;
 
+    io::stdout().execute(Clear(crossterm::terminal::ClearType::All))?;
     //ループ処理
     loop {
-        io::stdout().execute(Clear(crossterm::terminal::ClearType::All))?;
+        io::stdout().execute(cursor::MoveDown(3))?;
+
         println!("What would you like to do?");
         println!("1. Add task");
         println!("2. Delete task");
