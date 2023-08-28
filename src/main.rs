@@ -19,14 +19,17 @@
 
 // main.rs
 
-mod models; // models.rsをインポート
-mod db; // db.rsをインポート
+//モジュールインポート
+mod models;
+mod db;
 mod cli;
+
+//デフォルトクレート
 use std::io::{self, Write};
 
+//外部クレート
+use crossterm::{self, terminal::Clear, ExecutableCommand};
 use rusqlite::{Connection, Result};
-
-use crate::{cli::choose_task, db::toggle_task};
 
 ///`Box<dyn std::error::Error>` 
 /// Rustでよく使われるエラーハンドリングのパターンの一つです。
@@ -67,6 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //ループ処理
     loop {
+        io::stdout().execute(Clear(crossterm::terminal::ClearType::All))?;
         println!("What would you like to do?");
         println!("1. Add task");
         println!("2. Delete task");
@@ -74,7 +78,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("4. Task Complete");
         println!("5. Quit");
 
-        print!("Enter your choice: ");
+        print!(" : ");
         io::stdout().flush()?;
 
         let mut choice = String::new();
@@ -128,9 +132,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             4 => {
                 println!("Toggle tasks...");
 
-                match choose_task() {
+                match cli::choose_task() {
                     Ok(task_num) =>{
-                        match toggle_task(&conn, task_num) {
+                        match db::toggle_task(&conn, task_num) {
                             Ok(_) => println!("Task {} toggled", task_num),
                         Err(e) => println!("Failed to toggle task: {}", e),
                         }
@@ -152,4 +156,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 //Todo
-// CLIの表示非表示を処理する。crossterm と termion
+// Delete機能の追加
