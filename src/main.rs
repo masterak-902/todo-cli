@@ -26,6 +26,8 @@ use std::io::{self, Write};
 
 use rusqlite::{Connection, Result};
 
+use crate::{cli::choose_task, db::toggle_task};
+
 ///`Box<dyn std::error::Error>` 
 /// Rustでよく使われるエラーハンドリングのパターンの一つです。
 /// これは "boxed dynamic trait object" であり、`std::error::Error` トレイトを実装する任意の型を表します。
@@ -69,8 +71,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("1. Add task");
         println!("2. Delete task");
         println!("3. Show tasks");
-        println!("5. Task Complete");
-        println!("4. Quit");
+        println!("4. Task Complete");
+        println!("5. Quit");
 
         print!("Enter your choice: ");
         io::stdout().flush()?;
@@ -124,7 +126,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             },
             4 => {
-                
+                println!("Toggle tasks...");
+
+                match choose_task() {
+                    Ok(task_num) =>{
+                        match toggle_task(&conn, task_num) {
+                            Ok(_) => println!("Task {} toggled", task_num),
+                        Err(e) => println!("Failed to toggle task: {}", e),
+                        }
+
+                    }
+                    Err(_) => println!("Invalid input"),
+                }
             },
             5 => {
                 println!("Quitting...");

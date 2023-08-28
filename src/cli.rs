@@ -17,4 +17,27 @@ pub fn cli_add() -> io::Result<Option<ToDo>>{
     Ok(Some(ToDo::new(None, false, task_event)))
 }
 
-//SQLから番号指定でタスクを取得する
+//データを取得して返すプログラム、数字以外の入力はエラーを返す。
+pub fn choose_task() -> io::Result<i32> {
+
+    loop {
+        print!("Enter the task number to toggle (or type 'exit' to quit): ");
+        io::stdout().flush()?;
+
+        let mut task_num = String::new();
+        io::stdin().read_line(&mut task_num)?;
+
+        let trimmed_input = task_num.trim();
+
+        if trimmed_input.to_lowercase() == "exit" {
+            // exitの処理をここで行う
+            // 例えば、Errを返してループを抜ける
+            return Err(io::Error::new(io::ErrorKind::Other, "User exited"));
+        }
+
+        match trimmed_input.parse::<i32>() {
+            Ok(num) => return Ok(num),
+            Err(_) => println!("Invalid input. Please enter a number."),
+        }
+    }
+}

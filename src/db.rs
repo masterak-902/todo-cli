@@ -60,3 +60,12 @@ pub fn task_add (conn: &Connection, task: &ToDo) -> rusqlite::Result<()> {
     )?;
     Ok(())
 }
+
+//データ反転プログラム
+pub fn toggle_task(conn: &Connection, choose_task_num: i32) -> Result<()>{
+    conn.execute(
+        "UPDATE ToDo SET task_check = NOT task_check WHERE task_num = ?1",
+         params![choose_task_num],
+        )?;
+    Ok(())
+}
