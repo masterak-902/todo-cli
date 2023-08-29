@@ -19,9 +19,8 @@ pub fn cli_add() -> io::Result<Option<ToDo>>{
 
 //データを取得して返すプログラム、数字以外の入力はエラーを返す。
 pub fn choose_task() -> io::Result<i32> {
-
     loop {
-        print!("Enter the task number to toggle (or type 'exit' to quit): ");
+        print!("Enter the task number(or type 'exit' to quit): ");
         io::stdout().flush()?;
 
         let mut task_num = String::new();

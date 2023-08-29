@@ -69,3 +69,12 @@ pub fn toggle_task(conn: &Connection, choose_task_num: i32) -> Result<()>{
         )?;
     Ok(())
 }
+
+//データの削除
+pub fn task_remove (conn: &Connection, choose_task_num: i32) -> rusqlite::Result<()> {
+    conn.execute(
+        "DELETE FROM ToDo WHERE task_num = ?1",
+        params![choose_task_num],
+    )?;
+    Ok(())
+}

@@ -120,6 +120,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // タスクを削除
                 println!("Deleting task...");
                 // ここで `conn` を使用してデータベースからタスクを削除する
+
+                match cli::choose_task() {
+                    Ok(task_num) =>{
+                        match db::task_remove(&conn, task_num) {
+                            Ok(_) => println!("Task removed successfully"),
+                        Err(e) => println!("Failed to remove task: {}", e),
+                        }
+
+                    }
+                    Err(_) => println!("Invalid input"),
+                }
             },
             3 => {
                 // タスクを表示
@@ -138,7 +149,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Ok(task_num) =>{
                         match db::toggle_task(&conn, task_num) {
                             Ok(_) => println!("Task {} toggled", task_num),
-                        Err(e) => println!("Failed to toggle task: {}", e),
+                        Err(e) => println!("Failed to delete task: {}", e),
                         }
 
                     }
